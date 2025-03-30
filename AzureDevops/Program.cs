@@ -13,12 +13,25 @@ namespace AzureDevops
         {
             var builder = WebApplication.CreateBuilder(args);
 
+
+
             builder.Services.AddInfrastructure();
             builder.Services.AddCore();
             builder.Services.AddAutoMapper(typeof(ApplicationUserMappingProfile).Assembly);
             builder.Services.AddAutoMapper(typeof(RegisterRequestMappingProfile).Assembly);
 
             builder.Services.AddFluentValidationAutoValidation();
+
+            builder.Services.AddSwaggerGen();
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                {
+                    builder.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
+                });
+            });
 
             builder.Services.AddControllers().AddJsonOptions(
                 options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
@@ -28,6 +41,9 @@ namespace AzureDevops
             app.UseExceptionHandlingMiddleware();
 
             app.UseRouting();
+            app.UseSwagger();
+            app.UseSwaggerUI();
+            app.UseCors();
 
             app.UseAuthentication();
             app.UseAuthorization();
